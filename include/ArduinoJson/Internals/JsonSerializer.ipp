@@ -15,88 +15,87 @@
 #include "JsonSerializer.hpp"
 
 inline void ArduinoJson::Internals::JsonSerializer::serialize(
-    const JsonArray &array) {
-  _writer.beginArray();
+    const JsonArray& array, JsonWriter& writer) {
+  writer.beginArray();
 
   JsonArray::const_iterator it = array.begin();
   while (it != array.end()) {
-    serialize(*it);
+    serialize(*it, writer);
 
     ++it;
     if (it == array.end()) break;
 
-    _writer.writeComma();
+    writer.writeComma();
   }
 
-  _writer.endArray();
+  writer.endArray();
 }
 
 inline void ArduinoJson::Internals::JsonSerializer::serialize(
-    const JsonArraySubscript &arraySubscript) {
-  serialize(arraySubscript.as<JsonVariant>());
+    const JsonArraySubscript& arraySubscript, JsonWriter& writer) {
+  serialize(arraySubscript.as<JsonVariant>(), writer);
 }
 
-// Serialize the object to the specified JsonWriter
 inline void ArduinoJson::Internals::JsonSerializer::serialize(
-    const JsonObject &object) {
-  _writer.beginObject();
+    const JsonObject& object, JsonWriter& writer) {
+  writer.beginObject();
 
   JsonObject::const_iterator it = object.begin();
   while (it != object.end()) {
-    _writer.writeString(it->key);
-    _writer.writeColon();
-    serialize(it->value);
+    writer.writeString(it->key);
+    writer.writeColon();
+    serialize(it->value, writer);
 
     ++it;
     if (it == object.end()) break;
 
-    _writer.writeComma();
+    writer.writeComma();
   }
 
-  _writer.endObject();
+  writer.endObject();
 }
 
 template <typename TKey>
 inline void ArduinoJson::Internals::JsonSerializer::serialize(
-    const JsonObjectSubscript<TKey> &objectSubscript) {
-  serialize(objectSubscript.template as<JsonVariant>());
+    const JsonObjectSubscript<TKey>& objectSubscript, JsonWriter& writer) {
+  serialize(objectSubscript.template as<JsonVariant>(), writer);
 }
 
 inline void ArduinoJson::Internals::JsonSerializer::serialize(
-    const JsonVariant &variant) {
+    const JsonVariant& variant, JsonWriter& writer) {
   switch (variant._type) {
     case JSON_UNDEFINED:
       return;
 
     case JSON_ARRAY:
-      serialize(*variant._content.asArray);
+      serialize(*variant._content.asArray, writer);
       return;
 
     case JSON_OBJECT:
-      serialize(*variant._content.asObject);
+      serialize(*variant._content.asObject, writer);
       return;
 
     case JSON_STRING:
-      _writer.writeString(variant._content.asString);
+      writer.writeString(variant._content.asString);
       return;
 
     case JSON_UNPARSED:
-      _writer.writeRaw(variant._content.asString);
+      writer.writeRaw(variant._content.asString);
       return;
 
     case JSON_NEGATIVE_INTEGER:
-      _writer.writeRaw('-');
+      writer.writeRaw('-');
     case JSON_POSITIVE_INTEGER:
-      _writer.writeInteger(variant._content.asInteger);
+      writer.writeInteger(variant._content.asInteger);
       return;
 
     case JSON_BOOLEAN:
-      _writer.writeBoolean(variant._content.asInteger != 0);
+      writer.writeBoolean(variant._content.asInteger != 0);
       return;
 
     default:
       uint8_t decimals =
           static_cast<uint8_t>(variant._type - JSON_FLOAT_0_DECIMALS);
-      _writer.writeFloat(variant._content.asFloat, decimals);
+      writer.writeFloat(variant._content.asFloat, decimals);
   }
 }

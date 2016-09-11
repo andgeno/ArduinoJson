@@ -21,17 +21,13 @@ class JsonVariant;
 namespace Internals {
 
 class JsonSerializer {
-  JsonWriter &_writer;
-
  public:
-  explicit JsonSerializer(JsonWriter &writer) : _writer(writer) {}
-
-  void serialize(const JsonArray &);
-  void serialize(const JsonArraySubscript &);
-  void serialize(const JsonObject &);
+  static void serialize(const JsonArray &, JsonWriter &);
+  static void serialize(const JsonArraySubscript &, JsonWriter &);
+  static void serialize(const JsonObject &, JsonWriter &);
   template <typename TKey>
-  void serialize(const JsonObjectSubscript<TKey> &);
-  void serialize(const JsonVariant &);
+  static void serialize(const JsonObjectSubscript<TKey> &, JsonWriter &);
+  static void serialize(const JsonVariant &, JsonWriter &);
 };
 }
 }

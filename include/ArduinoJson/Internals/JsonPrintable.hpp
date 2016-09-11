@@ -32,8 +32,7 @@ class JsonPrintable {
  public:
   size_t printTo(Print &print) const {
     JsonWriter writer(print);
-    JsonSerializer serializer(writer);
-    serializer.serialize(downcast());
+    JsonSerializer::serialize(downcast(), writer);
     return writer.bytesWritten();
   }
 
